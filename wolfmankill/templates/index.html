@@ -19,13 +19,16 @@
 				<br><br>
   				<input type="button" id="voter" value="Submit">
 		  	</div>
+	<textarea id="chat" style="width: 500px; height: 250px; font-size: 18px; font-family: monospace; margin-top: 10px;"></textarea>
+	<p id="speakText">Your turn to Speak Now!</p>
+	<input type="button" id="donespeak" value="Done Speak">
 	</div>
+	
 </body>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
 <script type="text/javascript">
 	$(document).ready(function(){
-
 		// sending a connect request to the server.
 		var socket = io.connect("http://localhost:5000");
 
@@ -36,10 +39,11 @@
 		});
 
 		
-		$('#cba').click(function(event) { 
-			e.preventDefault();
-			console.log("emited");
-			alert("button");
+		$('#donespeak').click(function(event) {
+			console.log("done speaking");
+			$("#speakText").hide();
+			$("#donespeak").hide();
+			socket.emit("done speaking");
 		});
 
 		socket.on('after connect', function(msg){
@@ -47,8 +51,23 @@
 		});
 
 		socket.on('update value', function(msg) {
-			console.log('Slider value updated');
-			$('#'+msg.who).val(msg.data);
+			console.log('Value updated');
+			console.log(msg);
+			let max = 0;
+			let argmax = '';
+			for (const k in msg) {
+				if (msg[k] > max) {
+					max = msg[k];
+					argmax = k;
+				}
+			}
+			$("#chat").append("Vote Result: " + JSON.stringify(msg) + "\n");    
+			$("#chat").append("Winner: " + argmax + "\n\n");    
+		});
+
+		socket.on('speak', function() {
+			$("#speakText").show();
+			$("#donespeak").show();
 		});
 	});
 </script>
