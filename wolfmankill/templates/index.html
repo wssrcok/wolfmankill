@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Synchronized Slider</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css">
+</head>
+<body>
+	<div class="container text-center">
+		<h1 >Slider Demo</h1>
+		  	<div class="form-group">
+				<label for="candidate">Choose a person to vote: </label>
+				<select name="candidate" id="candidate" multiple>
+					<option value="player1">player1</option>
+					<option value="player2">player2</option>
+					<option value="player3">player3</option>
+					<option value="player4">player4</option>
+				</select>
+				<br><br>
+  				<input type="button" id="voter" value="Submit">
+		  	</div>
+	</div>
+</body>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.1.1/socket.io.js"></script>
+<script type="text/javascript">
+	$(document).ready(function(){
+
+		// sending a connect request to the server.
+		var socket = io.connect("http://localhost:5000");
+
+		// An event handler for a change of value
+		$('#voter').click(function(event) { 
+			socket.emit('Slider value changed', {who: $('#candidate').attr('id'), data: $('#candidate').val()[0]});
+			console.log("emited");
+		});
+
+		
+		$('#cba').click(function(event) { 
+			e.preventDefault();
+			console.log("emited");
+			alert("button");
+		});
+
+		socket.on('after connect', function(msg){
+			console.log('After connect', msg);
+		});
+
+		socket.on('update value', function(msg) {
+			console.log('Slider value updated');
+			$('#'+msg.who).val(msg.data);
+		});
+	});
+</script>
+</html>
